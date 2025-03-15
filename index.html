@@ -17,13 +17,13 @@
             background-color: #f4f4f4;
         }
         .container {
-            max-width: 500px;
+            max-width: 700px;
             width: 90%;
             background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            margin: 20px;
+            margin: 20px auto;
         }
         select, button {
             width: 100%;
@@ -67,49 +67,165 @@
             color: #666;
             font-size: 0.9em;
         }
+        #login-container {
+            max-width: 300px;
+            width: 90%;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #login-container button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #login-container button:hover {
+            background-color: #45a049;
+        }
+
+        #login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #login-container p {
+            color: #666;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #main-container {
+            display: none;
+            width: 100%;
+        }
+
+        #main-container.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>SSD Filter</h2>
-        <label for="ssd-type">Select SSD Type:</label>
-        <select id="ssd-type" onchange="loadBrands()">
-            <option value="">-- Select --</option>
-        </select>
+    <div id="login-container">
+        <h2>Login</h2>
+        <p>Username: admin</p>
+        <p>Password: admin</p>
+        <input type="text" id="username" placeholder="Username" class="login-input">
+        <input type="password" id="password" placeholder="Password" class="login-input">
+        <button onclick="login()">Login</button>
+    </div>
 
-        <div id="brand-container" class="hidden">
-            <label for="ssd-brand">Select Brand:</label>
-            <select id="ssd-brand" onchange="loadCapacities()"></select>
-        </div>
+    <div id="main-container">
+        <div class="container">
+            <h2>SSD Filter</h2>
+            <label for="ssd-type">Select SSD Type:</label>
+            <select id="ssd-type" onchange="loadBrands()">
+                <option value="">-- Select --</option>
+            </select>
 
-        <div id="capacity-container" class="hidden">
-            <label for="ssd-capacity">Select Capacity:</label>
-            <select id="ssd-capacity" onchange="loadPrice()"></select>
-        </div>
-
-        <div id="price-container" class="hidden">
-            <h3>Price: <span id="ssd-price"></span></h3>
-        </div>
-
-        <div id="cart-container" class="hidden">
-            <div class="quantity-container">
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" min="1" value="1" required>
-                <span class="stock-warning">(Max: <span id="max-quantity">0</span>)</span>
+            <div id="brand-container" class="hidden">
+                <label for="ssd-brand">Select Brand:</label>
+                <select id="ssd-brand" onchange="loadCapacities()"></select>
             </div>
-            <button onclick="addToCart()">Add to Cart</button>
-        </div>
 
-        <div id="cart-summary" class="hidden">
-            <h3>Shopping Cart</h3>
-            <div id="cart-items"></div>
-            <div id="cart-total">Total: $0.00</div>
-            <button onclick="finalizePurchase()">Finalize Purchase</button>
-            <button onclick="showInvoice()">Generate Invoice</button>
+            <div id="capacity-container" class="hidden">
+                <label for="ssd-capacity">Select Capacity:</label>
+                <select id="ssd-capacity" onchange="loadPrice()"></select>
+            </div>
+
+            <div id="price-container" class="hidden">
+                <h3>Price: <span id="ssd-price"></span></h3>
+            </div>
+
+            <div id="cart-container" class="hidden">
+                <div class="quantity-container">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" min="1" value="1" required>
+                    <span class="stock-warning">(Max: <span id="max-quantity">0</span>)</span>
+                </div>
+                <button onclick="addToCart()">Add to Cart</button>
+            </div>
+
+            <div id="cart-summary" class="hidden">
+                <h3>Shopping Cart</h3>
+                <div id="cart-items"></div>
+                <div id="cart-total">Total: $0.00</div>
+                <button onclick="finalizePurchase()">Finalize Purchase</button>
+                <button onclick="showInvoice()">Generate Invoice</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Modify the login function:
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'admin') {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                loadTypes();
+            } else {
+                alert('Invalid credentials! Use admin/admin');
+            }
+        }
+
+        // Add this code after the login function
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('password').focus();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                login();
+            }
+        });
+
+        // Replace the window.onload function with this:
+        window.onload = function() {
+            // Check if user is already logged in
+            if (sessionStorage.getItem('isLoggedIn')) {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                loadTypes();
+            }
+            
+            // Show welcome message only on first visit
+            if (!sessionStorage.getItem('welcomeShown')) {
+                alert("🚀Welcome, this is the product demo! This is how your product is about to be structured. Please use 'admin' as both the username and password to access the shop.");
+                sessionStorage.setItem('welcomeShown', 'true');
+            }
+        };
+
         // Dummy data in array format because they might not want to set up a server 
         //we will fetch the data from the API when provided 
         const ssdData = [
@@ -229,10 +345,19 @@
             });
         }
 
-        //show next section and load the brand
+        // Modify the loadBrands function
         function loadBrands() {
-            document.getElementById('brand-container').classList.remove('hidden');
             const selectedType = document.getElementById('ssd-type').value;
+            if (!selectedType) {
+                alert('Please select an SSD type first!');
+                return;
+            }
+
+            document.getElementById('brand-container').classList.remove('hidden');
+            document.getElementById('capacity-container').classList.add('hidden');
+            document.getElementById('price-container').classList.add('hidden');
+            document.getElementById('cart-container').classList.add('hidden');
+            
             const brands = [...new Set(ssdData.filter(s => s.kind === selectedType).map(s => s.brand))];
             const brandSelect = document.getElementById('ssd-brand');
             brandSelect.innerHTML = '<option value="">-- Select --</option>';
@@ -243,16 +368,33 @@
                 brandSelect.appendChild(option);
             });
         }
-        // same 
+
+        // Modify the loadCapacities function
         function loadCapacities() {
-            document.getElementById('capacity-container').classList.remove('hidden');
             const selectedType = document.getElementById('ssd-type').value;
             const selectedBrand = document.getElementById('ssd-brand').value;
-            const capacities = [...new Set(ssdData.filter(s => s.kind === selectedType && s.brand === selectedBrand).map(s => s.capacity))];
+            
+            if (!selectedType || !selectedBrand) {
+                alert('Please select both SSD type and brand!');
+                return;
+            }
+
+            document.getElementById('capacity-container').classList.remove('hidden');
+            document.getElementById('price-container').classList.add('hidden');
+            document.getElementById('cart-container').classList.add('hidden');
+            
+            const capacities = [...new Set(ssdData.filter(s => 
+                s.kind === selectedType && s.brand === selectedBrand
+            ).map(s => s.capacity))];
+            
             const capacitySelect = document.getElementById('ssd-capacity');
             capacitySelect.innerHTML = '<option value="">-- Select --</option>';
             capacities.forEach(capacity => {
-                const ssd = ssdData.find(s => s.kind === selectedType && s.brand === selectedBrand && s.capacity === capacity);
+                const ssd = ssdData.find(s => 
+                    s.kind === selectedType && 
+                    s.brand === selectedBrand && 
+                    s.capacity === capacity
+                );
                 let option = document.createElement('option');
                 option.value = capacity;
                 option.textContent = `${capacity} GB (${ssd.quantity} in stock)`;
@@ -261,14 +403,19 @@
             });
         }
         
-        //display price 
+        // Modify the loadPrice function
         function loadPrice() {
-            document.getElementById('price-container').classList.remove('hidden');
-            document.getElementById('cart-container').classList.remove('hidden');
-            
             const selectedType = document.getElementById('ssd-type').value;
             const selectedBrand = document.getElementById('ssd-brand').value;
             const selectedCapacity = parseInt(document.getElementById('ssd-capacity').value);
+            
+            if (!selectedType || !selectedBrand || !selectedCapacity) {
+                alert('Please select all SSD specifications!');
+                return;
+            }
+
+            document.getElementById('price-container').classList.remove('hidden');
+            document.getElementById('cart-container').classList.remove('hidden');
             
             const ssd = ssdData.find(s => 
                 s.kind === selectedType && 
@@ -489,7 +636,12 @@
             alert(invoice);
         }
 
-        loadTypes();
+        // Add this function to your script section
+        function logout() {
+            sessionStorage.removeItem('isLoggedIn');
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('main-container').style.display = 'none';
+        }
     </script>
 </body>
 </html>

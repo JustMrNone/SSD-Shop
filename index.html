@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSD Filter App</title>
+    <title>SSD Shop</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background-color: #f4f4f4;
         }
         .container {
             max-width: 500px;
-            margin: auto;
+            width: 90%;
             background: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin: 20px;
         }
         select, button {
             width: 100%;
@@ -27,6 +33,25 @@
         }
         .hidden {
             display: none;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 10px;
+            margin: 10px;
+        }
+        #cart-items {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .remove-item {
+            color: red;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -50,6 +75,20 @@
 
         <div id="price-container" class="hidden">
             <h3>Price: <span id="ssd-price"></span></h3>
+        </div>
+
+        <div id="cart-container" class="hidden">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" min="1" value="1">
+            <button onclick="addToCart()">Add to Cart</button>
+        </div>
+
+        <div id="cart-summary" class="hidden">
+            <h3>Shopping Cart</h3>
+            <div id="cart-items"></div>
+            <div id="cart-total">Total: $0.00</div>
+            <button onclick="finalizePurchase()">Finalize Purchase</button>
+            <button onclick="showInvoice()">Generate Invoice</button>
         </div>
     </div>
 
@@ -206,8 +245,91 @@
         //display price 
         function loadPrice() {
             document.getElementById('price-container').classList.remove('hidden');
-            const randomPrice = (Math.random() * (300 - 50) + 50).toFixed(2);
-            document.getElementById('ssd-price').textContent = '$' + randomPrice;
+            document.getElementById('cart-container').classList.remove('hidden');
+            currentPrice = (Math.random() * (300 - 50) + 50).toFixed(2);
+            document.getElementById('ssd-price').textContent = '$' + currentPrice;
+        }
+
+        let cart = [];
+        let currentPrice = 0;
+
+        function addToCart() {
+            const type = document.getElementById('ssd-type').value;
+            const brand = document.getElementById('ssd-brand').value;
+            const capacity = document.getElementById('ssd-capacity').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const price = parseFloat(currentPrice);
+
+            const item = {
+                type,
+                brand,
+                capacity,
+                quantity,
+                price,
+                total: quantity * price
+            };
+
+            cart.push(item);
+            updateCartDisplay();
+            document.getElementById('cart-summary').classList.remove('hidden');
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    ${item.brand} ${item.capacity}GB ${item.type} - 
+                    Quantity: ${item.quantity} - 
+                    Price: $${item.price} - 
+                    Subtotal: $${item.total.toFixed(2)}
+                    <span class="remove-item" onclick="removeItem(${index})">❌</span>
+                `;
+                cartItems.appendChild(itemDiv);
+                total += item.total;
+            });
+
+            document.getElementById('cart-total').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+        }
+
+        function finalizePurchase() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + item.total, 0);
+            alert(`Purchase completed! Total amount: $${total.toFixed(2)}`);
+            cart = [];
+            updateCartDisplay();
+        }
+
+        function showInvoice() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            let invoice = 'INVOICE\n\n';
+            invoice += 'Items:\n';
+            cart.forEach(item => {
+                invoice += `${item.brand} ${item.capacity}GB ${item.type}\n`;
+                invoice += `Quantity: ${item.quantity} x $${item.price} = $${item.total.toFixed(2)}\n`;
+                invoice += '------------------------\n';
+            });
+            
+            const total = cart.reduce((sum, item) => sum + item.total, 0);
+            invoice += `\nTotal Amount: $${total.toFixed(2)}`;
+            
+            alert(invoice);
         }
 
         loadTypes();

@@ -181,6 +181,43 @@
         #main-container.active {
             display: block;
         }
+
+        #payment-options, #delivery-options {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #payment-options h4, #delivery-options h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        #payment-options select, #delivery-options select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+        }
+
+        #installment-options {
+            margin-top: 10px;
+        }
+
+        #installment-options input {
+            width: 100px;
+            padding: 8px;
+        }
+
+        #online-options {
+            margin-top: 10px;
+        }
+
+        #online-options select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -228,6 +265,40 @@
                 <h3>Shopping Cart</h3>
                 <div id="cart-items"></div>
                 <div id="cart-total">Total: $0.00</div>
+                
+                <!-- Add payment options -->
+                <div id="payment-options">
+                    <h4>Payment Method</h4>
+                    <select id="payment-method" onchange="togglePaymentOptions()">
+                        <option value="cash">Cash Payment</option>
+                        <option value="online">Online Payment</option>
+                        <option value="installment">Installment Payment</option>
+                    </select>
+                    
+                    <div id="online-options" class="hidden">
+                        <h4>Select Online Payment Method</h4>
+                        <select id="online-payment-type">
+                            <option value="credit">Credit Card</option>
+                            <option value="debit">Debit Card</option>
+                            <option value="paypal">PayPal</option>
+                        </select>
+                    </div>
+
+                    <div id="installment-options" class="hidden">
+                        <label for="installment-days">Number of Days:</label>
+                        <input type="number" id="installment-days" min="30" max="360" step="30" value="30">
+                    </div>
+                </div>
+
+                <!-- Add delivery options -->
+                <div id="delivery-options">
+                    <h4>Delivery Method</h4>
+                    <select id="delivery-method">
+                        <option value="customer">Customer's Courier</option>
+                        <option value="office">Office Courier ($10)</option>
+                    </select>
+                </div>
+
                 <button onclick="finalizePurchase()">Finalize Purchase</button>
                 <button onclick="showInvoice()">Generate Invoice</button>
             </div>
@@ -660,13 +731,48 @@
             updateCartDisplay();
         }
 
+        function togglePaymentOptions() {
+            const paymentMethod = document.getElementById('payment-method').value;
+            const installmentOptions = document.getElementById('installment-options');
+            const onlineOptions = document.getElementById('online-options');
+            
+            // Hide all options first
+            installmentOptions.classList.add('hidden');
+            onlineOptions.classList.add('hidden');
+            
+            // Show relevant options based on selection
+            if (paymentMethod === 'installment') {
+                installmentOptions.classList.remove('hidden');
+            } else if (paymentMethod === 'online') {
+                onlineOptions.classList.remove('hidden');
+            }
+        }
+
         function finalizePurchase() {
             if (cart.length === 0) {
                 alert('Your cart is empty!');
                 return;
             }
+
             const total = cart.reduce((sum, item) => sum + item.total, 0);
-            alert(`Purchase completed! Total amount: $${total.toFixed(2)}`);
+            const paymentMethod = document.getElementById('payment-method').value;
+            
+            let message = '';
+            
+            switch(paymentMethod) {
+                case 'online':
+                    const onlineType = document.getElementById('online-payment-type').value;
+                    message = `Purchase completed!\nPayment Method: ${onlineType}\nTotal amount: $${total.toFixed(2)}`;
+                    break;
+                case 'installment':
+                    const days = document.getElementById('installment-days').value;
+                    message = `Purchase completed!\nPayment Method: ${days}-day installment\nTotal amount: $${total.toFixed(2)}`;
+                    break;
+                default:
+                    message = `Purchase completed!\nPayment Method: Cash\nTotal amount: $${total.toFixed(2)}`;
+            }
+            
+            alert(message);
             cart = [];
             updateCartDisplay();
         }
@@ -686,7 +792,40 @@
             });
             
             const total = cart.reduce((sum, item) => sum + item.total, 0);
-            invoice += `\nTotal Amount: $${total.toFixed(2)}`;
+            
+            // Get payment method details
+            const paymentMethod = document.getElementById('payment-method').value;
+            let paymentDetails = '';
+            switch(paymentMethod) {
+                case 'online':
+                    const onlineType = document.getElementById('online-payment-type').value;
+                    paymentDetails = `Payment Method: ${onlineType}`;
+                    break;
+                case 'installment':
+                    const days = document.getElementById('installment-days').value;
+                    paymentDetails = `Payment Method: ${days}-day installment`;
+                    break;
+                default:
+                    paymentDetails = 'Payment Method: Cash';
+            }
+            
+            // Get delivery method details
+            const deliveryMethod = document.getElementById('delivery-method').value;
+            const deliveryFee = deliveryMethod === 'office' ? 10 : 0;
+            const deliveryDetails = deliveryMethod === 'office' ? 
+                'Delivery: Office Courier ($10)' : 
+                'Delivery: Customer\'s Courier';
+            
+            // Add payment and delivery details to invoice
+            invoice += '\nOrder Details:\n';
+            invoice += `${paymentDetails}\n`;
+            invoice += `${deliveryDetails}\n`;
+            invoice += '------------------------\n';
+            invoice += `Subtotal: $${total.toFixed(2)}\n`;
+            if (deliveryFee > 0) {
+                invoice += `Delivery Fee: $${deliveryFee.toFixed(2)}\n`;
+            }
+            invoice += `Final Total: $${(total + deliveryFee).toFixed(2)}`;
             
             alert(invoice);
         }

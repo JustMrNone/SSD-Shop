@@ -277,11 +277,24 @@
             );
             
             const quantityInput = document.getElementById('quantity');
+            const addToCartButton = document.querySelector('#cart-container button');
+            
+            // Reset disabled state
+            quantityInput.disabled = false;
+            addToCartButton.disabled = false;
+            
+            // Set new values
             quantityInput.max = ssd.quantity;
-            quantityInput.value = 1;
+            quantityInput.value = Math.min(1, ssd.quantity);
             
             // Update the max quantity display
             document.getElementById('max-quantity').textContent = ssd.quantity;
+            
+            // If no stock available, disable controls
+            if (ssd.quantity === 0) {
+                quantityInput.disabled = true;
+                addToCartButton.disabled = true;
+            }
             
             currentPrice = (Math.random() * (300 - 50) + 50).toFixed(2);
             document.getElementById('ssd-price').textContent = '$' + currentPrice;
@@ -351,19 +364,25 @@
             // Update quantity displays
             document.getElementById('max-quantity').textContent = ssd.quantity;
             document.getElementById('quantity').max = ssd.quantity;
-            document.getElementById('quantity').value = Math.min(1, ssd.quantity); // Reset quantity input
+            
+            const quantityInput = document.getElementById('quantity');
+            const addToCartButton = document.querySelector('#cart-container button');
+            
+            if (ssd.quantity === 0) {
+                quantityInput.disabled = true;
+                addToCartButton.disabled = true;
+                quantityInput.value = 0;
+            } else {
+                quantityInput.disabled = false;
+                addToCartButton.disabled = false;
+                quantityInput.value = Math.min(1, ssd.quantity);
+            }
             
             // Update the capacity select option
             const capacityOption = document.querySelector(`#ssd-capacity option[value="${capacity}"]`);
             if (capacityOption) {
                 capacityOption.textContent = `${capacity} GB (${ssd.quantity} in stock)`;
                 capacityOption.dataset.quantity = ssd.quantity;
-            }
-
-            // If no more stock, disable the quantity input and add to cart button
-            if (ssd.quantity === 0) {
-                document.getElementById('quantity').disabled = true;
-                document.querySelector('#cart-container button').disabled = true;
             }
         }
 

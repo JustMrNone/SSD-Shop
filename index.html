@@ -53,6 +53,20 @@
             color: red;
             cursor: pointer;
         }
+        input[type="number"]:invalid {
+            border-color: red;
+            background-color: #ffebee;
+        }
+        .quantity-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .stock-warning {
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -78,8 +92,11 @@
         </div>
 
         <div id="cart-container" class="hidden">
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" min="1" value="1">
+            <div class="quantity-container">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" min="1" value="1" required>
+                <span class="stock-warning">(Max: <span id="max-quantity">0</span>)</span>
+            </div>
             <button onclick="addToCart()">Add to Cart</button>
         </div>
 
@@ -96,106 +113,106 @@
         // Dummy data in array format because they might not want to set up a server 
         //we will fetch the data from the API when provided 
         const ssdData = [
-            { id: 1, brand: "PNY", capacity: 2000, kind: "NVMe" },
-            { id: 2, brand: "Intel", capacity: 250, kind: "SATA" },
-            { id: 3, brand: "Western Digital", capacity: 4000, kind: "SATA" },
-            { id: 4, brand: "Corsair", capacity: 500, kind: "SATA" },
-            { id: 5, brand: "Kingston", capacity: 500, kind: "SATA" },
-            { id: 6, brand: "Seagate", capacity: 4000, kind: "SATA" },
-            { id: 7, brand: "Toshiba", capacity: 4000, kind: "M.2" },
-            { id: 8, brand: "PNY", capacity: 250, kind: "PCIe" },
-            { id: 9, brand: "Samsung", capacity: 250, kind: "SATA" },
-            { id: 10, brand: "Samsung", capacity: 2000, kind: "NVMe" },
-            { id: 11, brand: "Intel", capacity: 8000, kind: "M.2" },
-            { id: 12, brand: "PNY", capacity: 500, kind: "PCIe" },
-            { id: 13, brand: "Seagate", capacity: 250, kind: "M.2" },
-            { id: 14, brand: "Crucial", capacity: 2000, kind: "M.2" },
-            { id: 15, brand: "Seagate", capacity: 4000, kind: "NVMe" },
-            { id: 16, brand: "Toshiba", capacity: 250, kind: "NVMe" },
-            { id: 17, brand: "Corsair", capacity: 1000, kind: "PCIe" },
-            { id: 18, brand: "PNY", capacity: 250, kind: "PCIe" },
-            { id: 19, brand: "Samsung", capacity: 2000, kind: "M.2" },
-            { id: 20, brand: "Crucial", capacity: 2000, kind: "PCIe" },
-            { id: 21, brand: "ADATA", capacity: 1000, kind: "PCIe" },
-            { id: 22, brand: "Toshiba", capacity: 2000, kind: "SATA" },
-            { id: 23, brand: "Toshiba", capacity: 1000, kind: "M.2" },
-            { id: 24, brand: "Kingston", capacity: 2000, kind: "SATA" },
-            { id: 25, brand: "ADATA", capacity: 8000, kind: "SATA" },
-            { id: 26, brand: "Toshiba", capacity: 250, kind: "M.2" },
-            { id: 27, brand: "ADATA", capacity: 250, kind: "M.2" },
-            { id: 28, brand: "Toshiba", capacity: 500, kind: "NVMe" },
-            { id: 29, brand: "Corsair", capacity: 500, kind: "PCIe" },
-            { id: 30, brand: "Seagate", capacity: 250, kind: "M.2" },
-            { id: 31, brand: "ADATA", capacity: 1000, kind: "SATA" },
-            { id: 32, brand: "Western Digital", capacity: 250, kind: "NVMe" },
-            { id: 33, brand: "Samsung", capacity: 2000, kind: "PCIe" },
-            { id: 34, brand: "Intel", capacity: 1000, kind: "NVMe" },
-            { id: 35, brand: "Crucial", capacity: 4000, kind: "NVMe" },
-            { id: 36, brand: "Crucial", capacity: 4000, kind: "M.2" },
-            { id: 37, brand: "Seagate", capacity: 500, kind: "PCIe" },
-            { id: 38, brand: "Toshiba", capacity: 250, kind: "M.2" },
-            { id: 39, brand: "ADATA", capacity: 500, kind: "NVMe" },
-            { id: 40, brand: "Samsung", capacity: 8000, kind: "NVMe" },
-            { id: 41, brand: "Kingston", capacity: 2000, kind: "SATA" },
-            { id: 42, brand: "Kingston", capacity: 4000, kind: "SATA" },
-            { id: 43, brand: "ADATA", capacity: 4000, kind: "SATA" },
-            { id: 44, brand: "Samsung", capacity: 4000, kind: "NVMe" },
-            { id: 45, brand: "Seagate", capacity: 4000, kind: "SATA" },
-            { id: 46, brand: "Crucial", capacity: 1000, kind: "PCIe" },
-            { id: 47, brand: "Intel", capacity: 4000, kind: "SATA" },
-            { id: 48, brand: "ADATA", capacity: 4000, kind: "PCIe" },
-            { id: 49, brand: "Toshiba", capacity: 2000, kind: "NVMe" },
-            { id: 50, brand: "ADATA", capacity: 500, kind: "M.2" },
-            { id: 51, brand: "Western Digital", capacity: 500, kind: "NVMe" },
-            { id: 52, brand: "Toshiba", capacity: 8000, kind: "NVMe" },
-            { id: 53, brand: "ADATA", capacity: 2000, kind: "PCIe" },
-            { id: 54, brand: "Toshiba", capacity: 2000, kind: "M.2" },
-            { id: 55, brand: "Samsung", capacity: 2000, kind: "PCIe" },
-            { id: 56, brand: "Toshiba", capacity: 250, kind: "M.2" },
-            { id: 57, brand: "PNY", capacity: 2000, kind: "NVMe" },
-            { id: 58, brand: "Crucial", capacity: 8000, kind: "NVMe" },
-            { id: 59, brand: "Western Digital", capacity: 500, kind: "M.2" },
-            { id: 60, brand: "Seagate", capacity: 500, kind: "NVMe" },
-            { id: 61, brand: "Corsair", capacity: 8000, kind: "SATA" },
-            { id: 62, brand: "Western Digital", capacity: 1000, kind: "M.2" },
-            { id: 63, brand: "Corsair", capacity: 1000, kind: "PCIe" },
-            { id: 64, brand: "ADATA", capacity: 500, kind: "SATA" },
-            { id: 65, brand: "Western Digital", capacity: 500, kind: "PCIe" },
-            { id: 66, brand: "Kingston", capacity: 1000, kind: "PCIe" },
-            { id: 67, brand: "Crucial", capacity: 1000, kind: "PCIe" },
-            { id: 68, brand: "Seagate", capacity: 500, kind: "M.2" },
-            { id: 69, brand: "Corsair", capacity: 2000, kind: "NVMe" },
-            { id: 70, brand: "Western Digital", capacity: 8000, kind: "NVMe" },
-            { id: 71, brand: "Samsung", capacity: 1000, kind: "SATA" },
-            { id: 72, brand: "Corsair", capacity: 500, kind: "PCIe" },
-            { id: 73, brand: "Seagate", capacity: 500, kind: "SATA" },
-            { id: 74, brand: "ADATA", capacity: 250, kind: "PCIe" },
-            { id: 75, brand: "ADATA", capacity: 250, kind: "SATA" },
-            { id: 76, brand: "Seagate", capacity: 500, kind: "M.2" },
-            { id: 77, brand: "PNY", capacity: 2000, kind: "SATA" },
-            { id: 78, brand: "Toshiba", capacity: 250, kind: "M.2" },
-            { id: 79, brand: "Samsung", capacity: 4000, kind: "M.2" },
-            { id: 80, brand: "Crucial", capacity: 8000, kind: "SATA" },
-            { id: 81, brand: "Corsair", capacity: 500, kind: "PCIe" },
-            { id: 82, brand: "Corsair", capacity: 1000, kind: "PCIe" },
-            { id: 83, brand: "ADATA", capacity: 500, kind: "PCIe" },
-            { id: 84, brand: "Crucial", capacity: 250, kind: "PCIe" },
-            { id: 85, brand: "Corsair", capacity: 8000, kind: "NVMe" },
-            { id: 86, brand: "Samsung", capacity: 1000, kind: "M.2" },
-            { id: 87, brand: "PNY", capacity: 8000, kind: "NVMe" },
-            { id: 88, brand: "Western Digital", capacity: 8000, kind: "NVMe" },
-            { id: 89, brand: "Samsung", capacity: 250, kind: "SATA" },
-            { id: 90, brand: "PNY", capacity: 2000, kind: "PCIe" },
-            { id: 91, brand: "Toshiba", capacity: 4000, kind: "PCIe" },
-            { id: 92, brand: "Western Digital", capacity: 500, kind: "PCIe" },
-            { id: 93, brand: "Toshiba", capacity: 8000, kind: "PCIe" },
-            { id: 94, brand: "PNY", capacity: 1000, kind: "NVMe" },
-            { id: 95, brand: "Seagate", capacity: 1000, kind: "PCIe" },
-            { id: 96, brand: "Crucial", capacity: 500, kind: "NVMe" },
-            { id: 97, brand: "Intel", capacity: 2000, kind: "PCIe" },
-            { id: 98, brand: "Kingston", capacity: 1000, kind: "PCIe" },
-            { id: 99, brand: "Kingston", capacity: 2000, kind: "SATA" },
-            { id: 100, brand: "Corsair", capacity: 1000, kind: "PCIe" }
+            { id: 1, brand: "PNY", capacity: 2000, kind: "NVMe", quantity: 15 },
+            { id: 2, brand: "Intel", capacity: 250, kind: "SATA", quantity: 10 },
+            { id: 3, brand: "Western Digital", capacity: 4000, kind: "SATA", quantity: 8 },
+            { id: 4, brand: "Corsair", capacity: 500, kind: "SATA", quantity: 12 },
+            { id: 5, brand: "Kingston", capacity: 500, kind: "SATA", quantity: 20 },
+            { id: 6, brand: "Seagate", capacity: 4000, kind: "SATA", quantity: 5 },
+            { id: 7, brand: "Toshiba", capacity: 4000, kind: "M.2", quantity: 7 },
+            { id: 8, brand: "PNY", capacity: 250, kind: "PCIe", quantity: 14 },
+            { id: 9, brand: "Samsung", capacity: 250, kind: "SATA", quantity: 9 },
+            { id: 10, brand: "Samsung", capacity: 2000, kind: "NVMe", quantity: 11 },
+            { id: 11, brand: "Intel", capacity: 8000, kind: "M.2", quantity: 6 },
+            { id: 12, brand: "PNY", capacity: 500, kind: "PCIe", quantity: 13 },
+            { id: 13, brand: "Seagate", capacity: 250, kind: "M.2", quantity: 10 },
+            { id: 14, brand: "Crucial", capacity: 2000, kind: "M.2", quantity: 8 },
+            { id: 15, brand: "Seagate", capacity: 4000, kind: "NVMe", quantity: 5 },
+            { id: 16, brand: "Toshiba", capacity: 250, kind: "NVMe", quantity: 7 },
+            { id: 17, brand: "Corsair", capacity: 1000, kind: "PCIe", quantity: 12 },
+            { id: 18, brand: "PNY", capacity: 250, kind: "PCIe", quantity: 14 },
+            { id: 19, brand: "Samsung", capacity: 2000, kind: "M.2", quantity: 11 },
+            { id: 20, brand: "Crucial", capacity: 2000, kind: "PCIe", quantity: 8 },
+            { id: 21, brand: "ADATA", capacity: 1000, kind: "PCIe", quantity: 10 },
+            { id: 22, brand: "Toshiba", capacity: 2000, kind: "SATA", quantity: 7 },
+            { id: 23, brand: "Toshiba", capacity: 1000, kind: "M.2", quantity: 6 },
+            { id: 24, brand: "Kingston", capacity: 2000, kind: "SATA", quantity: 20 },
+            { id: 25, brand: "ADATA", capacity: 8000, kind: "SATA", quantity: 5 },
+            { id: 26, brand: "Toshiba", capacity: 250, kind: "M.2", quantity: 7 },
+            { id: 27, brand: "ADATA", capacity: 250, kind: "M.2", quantity: 10 },
+            { id: 28, brand: "Toshiba", capacity: 500, kind: "NVMe", quantity: 7 },
+            { id: 29, brand: "Corsair", capacity: 500, kind: "PCIe", quantity: 12 },
+            { id: 30, brand: "Seagate", capacity: 250, kind: "M.2", quantity: 10 },
+            { id: 31, brand: "ADATA", capacity: 1000, kind: "SATA", quantity: 10 },
+            { id: 32, brand: "Western Digital", capacity: 250, kind: "NVMe", quantity: 8 },
+            { id: 33, brand: "Samsung", capacity: 2000, kind: "PCIe", quantity: 11 },
+            { id: 34, brand: "Intel", capacity: 1000, kind: "NVMe", quantity: 6 },
+            { id: 35, brand: "Crucial", capacity: 4000, kind: "NVMe", quantity: 8 },
+            { id: 36, brand: "Crucial", capacity: 4000, kind: "M.2", quantity: 8 },
+            { id: 37, brand: "Seagate", capacity: 500, kind: "PCIe", quantity: 5 },
+            { id: 38, brand: "Toshiba", capacity: 250, kind: "M.2", quantity: 7 },
+            { id: 39, brand: "ADATA", capacity: 500, kind: "NVMe", quantity: 10 },
+            { id: 40, brand: "Samsung", capacity: 8000, kind: "NVMe", quantity: 11 },
+            { id: 41, brand: "Kingston", capacity: 2000, kind: "SATA", quantity: 20 },
+            { id: 42, brand: "Kingston", capacity: 4000, kind: "SATA", quantity: 20 },
+            { id: 43, brand: "ADATA", capacity: 4000, kind: "SATA", quantity: 10 },
+            { id: 44, brand: "Samsung", capacity: 4000, kind: "NVMe", quantity: 11 },
+            { id: 45, brand: "Seagate", capacity: 4000, kind: "SATA", quantity: 5 },
+            { id: 46, brand: "Crucial", capacity: 1000, kind: "PCIe", quantity: 8 },
+            { id: 47, brand: "Intel", capacity: 4000, kind: "SATA", quantity: 6 },
+            { id: 48, brand: "ADATA", capacity: 4000, kind: "PCIe", quantity: 10 },
+            { id: 49, brand: "Toshiba", capacity: 2000, kind: "NVMe", quantity: 7 },
+            { id: 50, brand: "ADATA", capacity: 500, kind: "M.2", quantity: 10 },
+            { id: 51, brand: "Western Digital", capacity: 500, kind: "NVMe", quantity: 8 },
+            { id: 52, brand: "Toshiba", capacity: 8000, kind: "NVMe", quantity: 7 },
+            { id: 53, brand: "ADATA", capacity: 2000, kind: "PCIe", quantity: 10 },
+            { id: 54, brand: "Toshiba", capacity: 2000, kind: "M.2", quantity: 7 },
+            { id: 55, brand: "Samsung", capacity: 2000, kind: "PCIe", quantity: 11 },
+            { id: 56, brand: "Toshiba", capacity: 250, kind: "M.2", quantity: 7 },
+            { id: 57, brand: "PNY", capacity: 2000, kind: "NVMe", quantity: 15 },
+            { id: 58, brand: "Crucial", capacity: 8000, kind: "NVMe", quantity: 8 },
+            { id: 59, brand: "Western Digital", capacity: 500, kind: "M.2", quantity: 8 },
+            { id: 60, brand: "Seagate", capacity: 500, kind: "NVMe", quantity: 5 },
+            { id: 61, brand: "Corsair", capacity: 8000, kind: "SATA", quantity: 12 },
+            { id: 62, brand: "Western Digital", capacity: 1000, kind: "M.2", quantity: 8 },
+            { id: 63, brand: "Corsair", capacity: 1000, kind: "PCIe", quantity: 12 },
+            { id: 64, brand: "ADATA", capacity: 500, kind: "SATA", quantity: 10 },
+            { id: 65, brand: "Western Digital", capacity: 500, kind: "PCIe", quantity: 8 },
+            { id: 66, brand: "Kingston", capacity: 1000, kind: "PCIe", quantity: 20 },
+            { id: 67, brand: "Crucial", capacity: 1000, kind: "PCIe", quantity: 8 },
+            { id: 68, brand: "Seagate", capacity: 500, kind: "M.2", quantity: 5 },
+            { id: 69, brand: "Corsair", capacity: 2000, kind: "NVMe", quantity: 12 },
+            { id: 70, brand: "Western Digital", capacity: 8000, kind: "NVMe", quantity: 8 },
+            { id: 71, brand: "Samsung", capacity: 1000, kind: "SATA", quantity: 11 },
+            { id: 72, brand: "Corsair", capacity: 500, kind: "PCIe", quantity: 12 },
+            { id: 73, brand: "Seagate", capacity: 500, kind: "SATA", quantity: 5 },
+            { id: 74, brand: "ADATA", capacity: 250, kind: "PCIe", quantity: 10 },
+            { id: 75, brand: "ADATA", capacity: 250, kind: "SATA", quantity: 10 },
+            { id: 76, brand: "Seagate", capacity: 500, kind: "M.2", quantity: 5 },
+            { id: 77, brand: "PNY", capacity: 2000, kind: "SATA", quantity: 15 },
+            { id: 78, brand: "Toshiba", capacity: 250, kind: "M.2", quantity: 7 },
+            { id: 79, brand: "Samsung", capacity: 4000, kind: "M.2", quantity: 11 },
+            { id: 80, brand: "Crucial", capacity: 8000, kind: "SATA", quantity: 8 },
+            { id: 81, brand: "Corsair", capacity: 500, kind: "PCIe", quantity: 12 },
+            { id: 82, brand: "Corsair", capacity: 1000, kind: "PCIe", quantity: 12 },
+            { id: 83, brand: "ADATA", capacity: 500, kind: "PCIe", quantity: 10 },
+            { id: 84, brand: "Crucial", capacity: 250, kind: "PCIe", quantity: 8 },
+            { id: 85, brand: "Corsair", capacity: 8000, kind: "NVMe", quantity: 12 },
+            { id: 86, brand: "Samsung", capacity: 1000, kind: "M.2", quantity: 11 },
+            { id: 87, brand: "PNY", capacity: 8000, kind: "NVMe", quantity: 15 },
+            { id: 88, brand: "Western Digital", capacity: 8000, kind: "NVMe", quantity: 8 },
+            { id: 89, brand: "Samsung", capacity: 250, kind: "SATA", quantity: 9 },
+            { id: 90, brand: "PNY", capacity: 2000, kind: "PCIe", quantity: 15 },
+            { id: 91, brand: "Toshiba", capacity: 4000, kind: "PCIe", quantity: 7 },
+            { id: 92, brand: "Western Digital", capacity: 500, kind: "PCIe", quantity: 8 },
+            { id: 93, brand: "Toshiba", capacity: 8000, kind: "PCIe", quantity: 7 },
+            { id: 94, brand: "PNY", capacity: 1000, kind: "NVMe", quantity: 15 },
+            { id: 95, brand: "Seagate", capacity: 1000, kind: "PCIe", quantity: 5 },
+            { id: 96, brand: "Crucial", capacity: 500, kind: "NVMe", quantity: 8 },
+            { id: 97, brand: "Intel", capacity: 2000, kind: "PCIe", quantity: 6 },
+            { id: 98, brand: "Kingston", capacity: 1000, kind: "PCIe", quantity: 20 },
+            { id: 99, brand: "Kingston", capacity: 2000, kind: "SATA", quantity: 20 },
+            { id: 100, brand: "Corsair", capacity: 1000, kind: "PCIe", quantity: 12 }
         ];
 
         
@@ -235,9 +252,11 @@
             const capacitySelect = document.getElementById('ssd-capacity');
             capacitySelect.innerHTML = '<option value="">-- Select --</option>';
             capacities.forEach(capacity => {
+                const ssd = ssdData.find(s => s.kind === selectedType && s.brand === selectedBrand && s.capacity === capacity);
                 let option = document.createElement('option');
                 option.value = capacity;
-                option.textContent = capacity + ' GB'; 
+                option.textContent = `${capacity} GB (${ssd.quantity} in stock)`;
+                option.dataset.quantity = ssd.quantity;
                 capacitySelect.appendChild(option);
             });
         }
@@ -246,6 +265,24 @@
         function loadPrice() {
             document.getElementById('price-container').classList.remove('hidden');
             document.getElementById('cart-container').classList.remove('hidden');
+            
+            const selectedType = document.getElementById('ssd-type').value;
+            const selectedBrand = document.getElementById('ssd-brand').value;
+            const selectedCapacity = parseInt(document.getElementById('ssd-capacity').value);
+            
+            const ssd = ssdData.find(s => 
+                s.kind === selectedType && 
+                s.brand === selectedBrand && 
+                s.capacity === selectedCapacity
+            );
+            
+            const quantityInput = document.getElementById('quantity');
+            quantityInput.max = ssd.quantity;
+            quantityInput.value = 1;
+            
+            // Update the max quantity display
+            document.getElementById('max-quantity').textContent = ssd.quantity;
+            
             currentPrice = (Math.random() * (300 - 50) + 50).toFixed(2);
             document.getElementById('ssd-price').textContent = '$' + currentPrice;
         }
@@ -256,23 +293,91 @@
         function addToCart() {
             const type = document.getElementById('ssd-type').value;
             const brand = document.getElementById('ssd-brand').value;
-            const capacity = document.getElementById('ssd-capacity').value;
+            const capacity = parseInt(document.getElementById('ssd-capacity').value);
             const quantity = parseInt(document.getElementById('quantity').value);
             const price = parseFloat(currentPrice);
 
-            const item = {
-                type,
-                brand,
-                capacity,
-                quantity,
-                price,
-                total: quantity * price
-            };
+            // Input validation
+            if (!quantity || quantity <= 0) {
+                alert('Error: Please enter a valid quantity!');
+                return;
+            }
 
-            cart.push(item);
+            // Find the selected SSD in inventory
+            const ssd = ssdData.find(s => 
+                s.kind === type && 
+                s.brand === brand && 
+                s.capacity === capacity
+            );
+
+            if (!ssd) {
+                alert('Error: Product not found in inventory!');
+                return;
+            }
+
+            // Check if quantity is available
+            if (quantity > ssd.quantity) {
+                alert(`Error: Not enough stock! Only ${ssd.quantity} units available.`);
+                return;
+            }
+
+            const existingCartItem = cart.find(item => 
+                item.type === type && 
+                item.brand === brand && 
+                item.capacity === capacity
+            );
+
+            // Update inventory quantity
+            ssd.quantity -= quantity;
+
+            if (existingCartItem) {
+                existingCartItem.quantity += quantity;
+                existingCartItem.total = existingCartItem.quantity * price;
+            } else {
+                cart.push({
+                    type,
+                    brand,
+                    capacity,
+                    quantity,
+                    price,
+                    total: quantity * price
+                });
+            }
+
+            // Update all UI elements
             updateCartDisplay();
             document.getElementById('cart-summary').classList.remove('hidden');
+            
+            // Update quantity displays
+            document.getElementById('max-quantity').textContent = ssd.quantity;
+            document.getElementById('quantity').max = ssd.quantity;
+            document.getElementById('quantity').value = Math.min(1, ssd.quantity); // Reset quantity input
+            
+            // Update the capacity select option
+            const capacityOption = document.querySelector(`#ssd-capacity option[value="${capacity}"]`);
+            if (capacityOption) {
+                capacityOption.textContent = `${capacity} GB (${ssd.quantity} in stock)`;
+                capacityOption.dataset.quantity = ssd.quantity;
+            }
+
+            // If no more stock, disable the quantity input and add to cart button
+            if (ssd.quantity === 0) {
+                document.getElementById('quantity').disabled = true;
+                document.querySelector('#cart-container button').disabled = true;
+            }
         }
+
+        // Add this after the addToCart function
+        document.getElementById('quantity').addEventListener('input', function(e) {
+            const maxQuantity = parseInt(this.max);
+            const value = parseInt(this.value);
+            
+            if (value > maxQuantity) {
+                this.value = maxQuantity;
+            } else if (value < 1) {
+                this.value = 1;
+            }
+        });
 
         function updateCartDisplay() {
             const cartItems = document.getElementById('cart-items');
@@ -297,6 +402,39 @@
         }
 
         function removeItem(index) {
+            const item = cart[index];
+            
+            // Return quantity to inventory
+            const ssd = ssdData.find(s => 
+                s.kind === item.type && 
+                s.brand === item.brand && 
+                s.capacity === item.capacity
+            );
+            
+            if (ssd) {
+                ssd.quantity += item.quantity;
+                
+                // Update the capacity select option if it's currently visible
+                if (document.getElementById('capacity-container').classList.contains('hidden') === false) {
+                    const capacityOption = document.querySelector(`#ssd-capacity option[value="${item.capacity}"]`);
+                    if (capacityOption) {
+                        capacityOption.textContent = `${item.capacity} GB (${ssd.quantity} in stock)`;
+                    }
+                }
+                
+                // Update max quantity display if this is the currently selected item
+                const selectedType = document.getElementById('ssd-type').value;
+                const selectedBrand = document.getElementById('ssd-brand').value;
+                const selectedCapacity = parseInt(document.getElementById('ssd-capacity').value);
+                
+                if (selectedType === item.type && 
+                    selectedBrand === item.brand && 
+                    selectedCapacity === item.capacity) {
+                    document.getElementById('max-quantity').textContent = ssd.quantity;
+                    document.getElementById('quantity').max = ssd.quantity;
+                }
+            }
+            
             cart.splice(index, 1);
             updateCartDisplay();
         }
